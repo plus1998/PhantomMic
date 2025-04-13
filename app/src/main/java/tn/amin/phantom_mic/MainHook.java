@@ -3,6 +3,7 @@ package tn.amin.phantom_mic;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.net.Uri;
 import android.os.Bundle;
@@ -94,14 +95,16 @@ public class MainHook implements IXposedHookLoadPackage {
         phantomManager = new PhantomManager(context, isNativeHook());
         if (isSpecialCase()) {
             phantomManager.forceUriPath();
-//            phantomManager.updateAudioFormat(16000, 2, 1);
-//            phantomManager.load();
+            // QQ语音 16000 AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_DEFAULT
+            // 抖音语音 44100 AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
+            // 抖音直播 48000 AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT
+            phantomManager.updateAudioFormat(48000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT);
+            phantomManager.load();
         }
     }
 
     private boolean isSpecialCase() {
-        return packageName.equals("com.whatsapp")
-                || packageName.equals("com.android.soundrecorder");
+        return packageName.equals("com.ss.android.ugc.aweme");
     }
 
     public boolean isNativeHook() {

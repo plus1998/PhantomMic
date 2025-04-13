@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import de.robv.android.xposed.XposedBridge;
 import tn.amin.phantom_mic.audio.AudioMaster;
 import tn.amin.phantom_mic.hook.ActivityResultWrapper;
 import tn.amin.phantom_mic.log.Logger;
@@ -121,13 +122,16 @@ public class PhantomManager {
         String fileName = mFileManager.readLine(mUriPath, FILE_CONFIG);
         if (fileName == null || fileName.trim().isEmpty()) {
             Logger.d("No audio file specified");
+            Toast.makeText(mContext.get(), "没有指定音频文件", Toast.LENGTH_SHORT).show();
             return;
         }
 
         FileDescriptor fd = mFileManager.openAudioWithName(mUriPath, fileName.trim());
+        Logger.d("PhantomMic: openAudioWithName: " + fd);
 
         if (fd == null) {
-            Toast.makeText(mContext.get(), "Could not open file", Toast.LENGTH_SHORT).show();
+            Logger.d("PhantomMic: Could not open file mUriPath=" + mUriPath + ", fileName=" + fileName);
+            Toast.makeText(mContext.get(), "无法打开文件", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -139,7 +143,7 @@ public class PhantomManager {
     private void ensureHasUriPath() {
         if (mUriPath == null) {
             mUriPath = Uri.fromFile(new File(mContext.get().getExternalFilesDir(null), DEFAULT_RECORDINGS_PATH));
-            Toast.makeText(mContext.get(), "[E] Defaulting to " + mUriPath.getPath(), Toast.LENGTH_SHORT).show();
+            Logger.d("PhantomManager: Using default recordings path: " + mUriPath);
         }
     }
 
